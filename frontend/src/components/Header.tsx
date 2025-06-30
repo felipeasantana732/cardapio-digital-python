@@ -6,9 +6,10 @@ import { useCart } from '../contexts/CartContext';
 interface HeaderProps {
   onCartClick: () => void;
   onLoginClick: () => void;
+  onOrdersClick: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onCartClick, onLoginClick }) => {
+const Header: React.FC<HeaderProps> = ({ onCartClick, onLoginClick, onOrdersClick }) => {
   const { cliente, logout, isAuthenticated } = useAuth();
   const { itemCount } = useCart();
 
@@ -37,10 +38,13 @@ const Header: React.FC<HeaderProps> = ({ onCartClick, onLoginClick }) => {
             
             {isAuthenticated ? (
               <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-2">
-                  <User size={20} className="text-gray-600" />
+                <button
+                  onClick={onOrdersClick}
+                  className="flex items-center space-x-2 p-2 text-gray-600 hover:text-primary-600 transition-colors rounded-md"
+                >
+                  <User size={20} />
                   <span className="text-sm text-gray-700">{cliente?.nome}</span>
-                </div>
+                </button>
                 <button
                   onClick={logout}
                   className="p-2 text-gray-600 hover:text-primary-600 transition-colors"

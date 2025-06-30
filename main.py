@@ -1,11 +1,12 @@
-from fastapi import FastAPI, HTTPException
-from models import Categoria, ItemMenu, Pedido, LoginRequest, Pagamento, PagamentoCreate, PedidoCreate
+from models import Categoria, ItemMenu, Pedido, LoginRequest, Pagamento, PagamentoCreate, PedidoCreate, ItemPedido
 from data import categorias, itens_menu, clientes, pedidos
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from models import (
     Categoria, CategoriaCreate, CategoriaUpdate,
     ItemMenu, ItemMenuCreate, ItemMenuUpdate
 )
+from datetime import datetime
 
 app = FastAPI(title="Cardapio Digital API")
 
@@ -99,24 +100,42 @@ def criar_pedido(pedido_create: PedidoCreate):
     if not any(c.id == pedido_create.id_cliente for c in clientes):
         raise HTTPException(status_code=404, detail="Cliente não encontrado")
 
-    # Calcula o valor total do pedido
+    # Calcula o valor total do pedido e constrói a lista de ItemPedido
+    itens_do_pedido = []
     valor_total = 0
-    for item_id in pedido_create.itens:
-        item = next((i for i in itens_menu if i.id == item_id), None)
-        if item:
-            valor_total += item.preco
-        else:
-            raise HTTPException(status_code=404, detail=f"Item com id {item_id} não encontrado")
+    for item_data in pedido_create.itens:
+        item_menu = next((i for i in itens_menu if i.id == item_data.item_id), None)
+        if not item_menu:
+            raise HTTPException(status_code=404, detail=f"Item de menu com id {item_data.item_id} não encontrado")
+        
+        item_pedido = ItemPedido(
+            item_menu=item_menu,
+            quantidade=item_data.quantidade,
+            preco_unitario=item_menu.preco # Preço unitário no momento do pedido
+        )
+        itens_do_pedido.append(item_pedido)
+        valor_total += item_pedido.quantidade * item_pedido.preco_unitario
 
     novo_id = (max([p.id for p in pedidos]) + 1) if pedidos else 1
     novo_pedido = Pedido(
         id=novo_id,
         id_cliente=pedido_create.id_cliente,
-        itens=pedido_create.itens,
-        valor_total=valor_total
+        data_pedido=datetime.now().isoformat(),
+        valor_total=valor_total,
+        status="Pendente", # Status inicial do pedido
+        itens=itens_do_pedido,
+        pagamentos=[],
+        valor_pago=0
     )
     pedidos.append(novo_pedido)
     return novo_pedido
+
+@app.get("/pedidos/cliente/{cliente_id}")
+def listar_pedidos_por_cliente(cliente_id: int):
+    pedidos_cliente = [p for p in pedidos if p.id_cliente == cliente_id]
+    if not pedidos_cliente:
+        raise HTTPException(status_code=404, detail="Nenhum pedido encontrado para este cliente")
+    return pedidos_cliente
 
 @app.get("/pedidos")
 def listar_pedidos():

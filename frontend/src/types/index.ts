@@ -23,11 +23,20 @@ export interface Pagamento {
   forma_pagamento: string;
 }
 
+export interface ItemPedido {
+  id: number;
+  item_menu: ItemMenu;
+  quantidade: number;
+  preco_unitario: number;
+}
+
 export interface Pedido {
   id: number;
   id_cliente: number;
-  itens: number[];
+  data_pedido: string;
   valor_total: number;
+  status: string;
+  itens: ItemPedido[];
   pagamentos: Pagamento[];
   valor_pago: number;
 }

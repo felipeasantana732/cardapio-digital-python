@@ -34,6 +34,7 @@ export const pedidoService = {
   criar: (pedido: PedidoCreate) => api.post<Pedido>('/pedidos', pedido),
   listar: () => api.get<Pedido[]>('/pedidos'),
   obter: (id: number) => api.get<Pedido>(`/pedidos/${id}`),
+  listarPedidosPorCliente: (clienteId: number) => api.get<Pedido[]>(`/pedidos/cliente/${clienteId}`),
 };
 
 export const pagamentoService = {

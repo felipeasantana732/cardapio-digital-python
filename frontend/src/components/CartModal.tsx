@@ -23,13 +23,14 @@ const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose }) => {
 
     setLoading(true);
     try {
-      const itensIds = items.flatMap(item => 
-        Array(item.quantidade).fill(item.id)
-      );
+      const itensParaPedido = items.map(item => ({
+        item_id: item.id,
+        quantidade: item.quantidade,
+      }));
 
       await pedidoService.criar({
         id_cliente: cliente.id,
-        itens: itensIds
+        itens: itensParaPedido,
       });
 
       setSuccess(true);

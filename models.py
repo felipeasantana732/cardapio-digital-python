@@ -28,6 +28,11 @@ class ItemMenu(BaseModel):
     preco: float
     categoria_id: int
 
+class ItemPedido(BaseModel):
+    item_menu: ItemMenu
+    quantidade: int
+    preco_unitario: float
+
 class ItemMenuCreate(BaseModel):
     nome: str
     descricao: str
@@ -45,14 +50,20 @@ class ItemMenuUpdate(BaseModel):
 class Pedido(BaseModel):
     id: int
     id_cliente: int
-    itens: List[int]
+    data_pedido: str
     valor_total: float
+    status: str = Field(default="Pendente")
+    itens: List[ItemPedido]
     pagamentos: Optional[List[Pagamento]] = []
     valor_pago: float = Field(default=0)
 
+class PedidoCreateItem(BaseModel):
+    item_id: int
+    quantidade: int
+
 class PedidoCreate(BaseModel):
     id_cliente: int
-    itens: List[int]
+    itens: List[PedidoCreateItem]
 
 # --- Modelos de Cliente e Login ---
 

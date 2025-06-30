@@ -6,6 +6,7 @@ import MenuCard from './components/MenuCard';
 import CategoryFilter from './components/CategoryFilter';
 import LoginModal from './components/LoginModal';
 import CartModal from './components/CartModal';
+import OrdersModal from './components/OrdersModal';
 import { categoriaService, menuService } from './services/api';
 import { Categoria, ItemMenu } from './types';
 
@@ -15,6 +16,7 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+  const [isOrdersModalOpen, setIsOrdersModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -59,6 +61,7 @@ function App() {
           <Header
             onCartClick={() => setIsCartModalOpen(true)}
             onLoginClick={() => setIsLoginModalOpen(true)}
+            onOrdersClick={() => setIsOrdersModalOpen(true)}
           />
           
           <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -100,6 +103,11 @@ function App() {
           <CartModal
             isOpen={isCartModalOpen}
             onClose={() => setIsCartModalOpen(false)}
+          />
+
+          <OrdersModal
+            isOpen={isOrdersModalOpen}
+            onClose={() => setIsOrdersModalOpen(false)}
           />
         </div>
       </CartProvider>
